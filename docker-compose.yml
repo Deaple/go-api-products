@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  go_api:
+    container_name: go_api
+    image: localhost/go-api-products:1.0
+    build: .
+    ports:
+      - 8080:8080
+    depends_on:
+      - go_db
+  go_db:
+    container_name: go_db
+    image: postgres:12
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  gb_gui:
+    image: dbeaver/cloudbeaver
+    ports: ["8000:8978"]
+    hostname: gui
+    container_name: dbeaver
+    volumes:
+      - dbeaver:/opt/cloudbeaver/workspace:z
+    tty: true
+    depends_on:
+      - go_db
+    links:
+      - go_db
+
+volumes:
+  pgdata: {}
+  dbeaver: {}
